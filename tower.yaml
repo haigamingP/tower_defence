@@ -1,0 +1,319 @@
+# ==========================================
+# FILE CẤU HÌNH THÁP (TOWER CONFIG)
+# ==========================================
+
+# 1. THÁP CUNG THỦ (ARCHER TOWER)
+# ------------------------------------------
+base_archer_tower:
+  name: "Chòi Canh"
+  type: PHYSICAL
+  levels:
+    1: { cost: 70,  range: 2.0, damage: I,   speed: 1.0 } # DPS: 15
+    2: { cost: 110, range: 2.5, damage: II,  speed: 1.0 } # DPS: 30
+    3: { cost: 150, range: 3.0, damage: III, speed: 1.0 } # DPS: 60
+
+# --- NHÁNH TIẾN HÓA 1: TỐC ĐỘ CAO ---
+rapid_archer_tower: # [Thần tiễn]
+  parent: base_archer_tower
+  cost: 400
+  stats: { range: 4.0, damage_value: 35, speed: 3.0 } # DPS gốc: 120
+  skills:
+    poison_arrow: 
+      name: "Tên độc"
+      type: PASSIVE_ON_HIT
+      levels: 
+        1: { cost: 100, bonus_magic_dmg: 5 } # Đã cân bằng lại
+        2: { cost: 100, bonus_magic_dmg: 10 }
+        3: { cost: 100, bonus_magic_dmg: 15 }
+    
+    burning_shot:
+      name: "Phóng hỏa"
+      type: CHANCE_ON_HIT
+      levels:
+        1: { cost: 100, chance: 0.10, duration: 3 }
+        2: { cost: 100, chance: 0.15, duration: 3 }
+        3: { cost: 100, chance: 0.20, duration: 3 }
+
+# --- NHÁNH TIẾN HÓA 2: SÁT THƯƠNG LỚN ---
+sniper_tower: # [Bắn tỉa]
+  parent: base_archer_tower
+  cost: 400
+  stats: { range: 5.0, damage: IV, speed: 0.8 } # Đã buff range và speed nhẹ
+  skills:
+    critical_shot:
+      name: "Chí mạng"
+      type: CHANCE_ON_HIT
+      levels:
+        1: { cost: 150, chance: 0.15, mult: 1.75 }
+        2: { cost: 150, chance: 0.20, mult: 1.75 }
+        3: { cost: 150, chance: 0.25, mult: 1.75 }
+        
+    execute:
+      name: "Chấm dứt"
+      type: CONDITIONAL
+      levels:
+        1: { cost: 200, threshold: 0.07 } # Dưới 7% máu
+        2: { cost: 200, threshold: 0.12 }
+        3: { cost: 200, threshold: 0.15 }
+
+# ==========================================
+# FILE CẤU HÌNH THÁP LÍNH (BARRACKS CONFIG)
+# ==========================================
+
+# 1. TRẠI LÍNH CƠ BẢN (BASIC BARRACKS)
+# ------------------------------------------
+base_barracks_tower:
+  name: "Trại Lính"
+  type: BARRACKS
+  respawn_time: 10 # Giây (Thời gian hồi sinh lính chết)
+  unit_count: 3
+  levels:
+    1: 
+      cost: 70
+      stats: { hp: LV2, dmg: I, armor: LOW, magic_res: NONE }
+      # HP: 150 | Dmg: 15 | Giáp: 90% nhận vào
+    2: 
+      cost: 110
+      stats: { hp: LV3, dmg: I, armor: MED, magic_res: LOW }
+      # HP: 400 | Dmg: 15 | Giáp: 75% nhận vào
+    3: 
+      cost: 150
+      stats: { hp: LV3, dmg: II, armor: MED, magic_res: MED }
+      # HP: 400 | Dmg: 30 | Giáp: 75% nhận vào
+
+# --- NHÁNH TIẾN HÓA 1: TANKER (THÁNH HIỆP SĨ) ---
+paladin_tower:
+  parent: base_barracks_tower
+  cost: 230 # (Giá nâng cấp từ cấp 3)
+  unit_count: 3
+  stats: { hp: LV4, dmg: II, armor: HIGH, magic_res: HIGH }
+  # HP: 800 | Dmg: 30 | Giáp/Kháng: 50% nhận vào (Siêu trâu)
+  
+  skills:
+    reflection: # [Phản đòn]
+      name: "Phản đòn"
+      type: PASSIVE_DEFENSE
+      levels:
+        1: { cost: 150, chance: 0.30, reflect_pct: 0.30 }
+        2: { cost: 150, chance: 0.40, reflect_pct: 0.30 }
+        3: { cost: 150, chance: 0.50, reflect_pct: 0.30 }
+    
+    absortion: # [Hấp thụ]
+      name: "Hấp thụ"
+      type: PASSIVE_DEFENSE
+      levels:
+        1: { cost: 200, reduce_pct: 0.15 }
+        2: { cost: 200, reduce_pct: 0.20 }
+        3: { cost: 200, reduce_pct: 0.25 }
+        
+    blessing: # [Phước lành nữ thần]
+      name: "Phước lành"
+      type: REGEN_AURA
+      levels:
+        1: { cost: 200, heal_pct: 0.05, interval: 2.0 }
+        2: { cost: 200, heal_pct: 0.10, interval: 2.0 }
+        3: { cost: 200, heal_pct: 0.15, interval: 2.0 }
+
+# --- NHÁNH TIẾN HÓA 2: FIGHTER (VIKING) ---
+viking_tower:
+  parent: base_barracks_tower
+  cost: 230
+  unit_count: 3
+  stats: { hp: LV3, dmg: III, armor: MED, magic_res: MED }
+  
+  skills:
+    axe_throw:
+      name: "Ném rìu"
+      type: ACTIVE_COOLDOWN
+      range: 150
+      cooldown: 5.0
+      levels:
+        1: { cost: 150, damage: 25 }
+        2: { cost: 150, damage: 50 }
+        3: { cost: 150, damage: 75 }
+        
+    berserk: # [Say máu - ĐÃ CÂN BẰNG]
+      name: "Say máu"
+      type: CONDITIONAL_BUFF
+      condition: "hp_below_threshold"
+      effects: 
+        damage_tier: IV       # Sát thương 120
+        lifesteal_pct: 0.25   # CHỈNH SỬA: Giảm từ 0.5 xuống 0.25 (Hút 25%)
+      levels:
+        1: { cost: 200, threshold: 0.15 } # Dưới 15% máu (Rất nguy hiểm mới kích hoạt)
+        2: { cost: 200, threshold: 0.20 }
+        3: { cost: 200, threshold: 0.30 }
+        
+    whirlwind:
+      name: "Lốc cuồng"
+      type: CHANCE_ON_HIT
+      is_aoe: true
+      levels:
+        1: { cost: 150, chance: 0.20 } # Giảm tỉ lệ nổ lốc một chút
+        2: { cost: 150, chance: 0.25 }
+        3: { cost: 150, chance: 0.30 }
+
+# ==========================================
+# FILE CẤU HÌNH THÁP PHÁP SƯ (MAGE TOWER)
+# ==========================================
+
+# 1. THÁP PHÁP SƯ CƠ BẢN
+# ------------------------------------------
+base_mage_tower:
+  name: "Tháp Huyền Bí"
+  type: MAGIC
+  levels:
+    1: { cost: 90,  range: 2.0, damage: I,   speed: 1.0 } # DPS: 15
+    2: { cost: 150, range: 2.5, damage: II,  speed: 1.0 } # DPS: 30
+    3: { cost: 210, range: 3.0, damage: III, speed: 1.0 } # DPS: 60
+
+# --- NHÁNH 1: SÁT THƯƠNG CHỦ LỰC (TỐI THƯỢNG) ---
+ultimate_mage_tower:
+  parent: base_mage_tower
+  cost: 400
+  stats: { range: 4.0, damage: IV, speed: 1.0 } 
+  # Sát thương: 120 (Cực lớn) | Tốc độ chậm
+  
+  skills:
+    death_ray: # [Tia chết chóc]
+      name: "Tia chết chóc"
+      type: CHANCE_ON_HIT
+      exclude_boss: true # Quan trọng: Không tác dụng lên Boss
+      levels:
+        1: { cost: 200, chance: 0.02, gold_bonus: 5 }
+        2: { cost: 200, chance: 0.03, gold_bonus: 10 }
+        3: { cost: 200, chance: 0.05, gold_bonus: 15 }
+        
+    teleport_blast: # [Dịch chuyển]
+      name: "Dịch chuyển không gian"
+      type: CC_PUSHBACK
+      stats: { push_distance: 5.0 } # Đẩy lùi 5 ô theo đường đi
+      levels:
+        1: { cost: 150, chance: 0.12 }
+        2: { cost: 150, chance: 0.20 }
+        3: { cost: 150, chance: 0.30 }
+
+# --- NHÁNH 2: HỖ TRỢ & KHỐNG CHẾ (ẨN TU) - ĐÃ CÂN BẰNG ---
+hermit_mage_tower:
+  parent: base_mage_tower
+  cost: 400
+  stats: { range: 4.0, damage: III, speed: 1 } 
+  
+  skills:
+    weakness: # [Nội tại: Suy nhược]
+      name: "Suy nhược"
+      type: PASSIVE_DEBUFF
+      effect: "apply_curse" 
+      target_logic: "priority_non_cursed"
+      levels:
+        1: { cost: 0, duration: 3.0 }
+        
+    polymorph: # [Biến hóa - ĐÃ FIX]
+      name: "Biến Ếch"
+      type: CC_TRANSFORM
+      exclude_boss: true
+      effect: "silence_attack" 
+      levels:
+        1: { cost: 150, chance: 0.15, duration: 3.0 } # Cố định 3s
+        2: { cost: 150, chance: 0.20, duration: 3.0 } # Chỉ tăng tỉ lệ
+        3: { cost: 150, chance: 0.25, duration: 3.0 }
+        
+    summon_golem: 
+      name: "Triệu hồi Golem"
+      type: SUMMON_UNIT
+      unit_count: 1
+      stats: { armor: MED, magic_res: MED, damage: II }
+      levels:
+        1: { cost: 250, hp: 500,  respawn: 40 } # Tăng t.gian hồi sinh
+        2: { cost: 250, hp: 750,  respawn: 35 }
+        3: { cost: 250, hp: 1000, respawn: 30 }
+
+
+# ==========================================
+# FILE CẤU HÌNH THÁP PHÁO (FINAL VERSION)
+# ==========================================
+
+base_cannon_tower:
+  name: "Đại Bác"
+  type: PHYSICAL_AOE
+  levels:
+    1: { cost: 110, range: 2.0, damage: II,  speed: 0.5, aoe: 2.0 }
+    2: { cost: 190, range: 3.0, damage: III, speed: 0.5, aoe: 2.0 }
+    3: { cost: 240, range: 3.0, damage: III, speed: 0.5, aoe: 2.0 }
+
+# --- NHÁNH 1: TÊN LỬA (PURE DAMAGE / MAP CONTROL) ---
+rocket_tower:
+  parent: base_cannon_tower
+  cost: 450
+  # BUFF: Tăng aoe lên 2.5 và speed lên 0.5 để DPS = 60
+  stats: { range: 4.0, damage: IV, speed: 0.5, aoe_radius: 2.5 }
+  
+  skills:
+    carpet_bombing: # [Rải bom]
+      name: "Rải thảm"
+      type: AREA_DAMAGE_LINE
+      range: 4.0
+      width: 1.5
+      damage_flat: 100
+      levels:
+        1: { cost: 200, cooldown: 5.0 }
+        2: { cost: 200, cooldown: 4.0 }
+        3: { cost: 200, cooldown: 3.0 }
+        
+    homing_missile: 
+      name: "Tên lửa đạn đạo"
+      type: SNIPER_SHOT
+      range: 999.0 
+      target: "lowest_hp"
+      damage_flat: 50
+      levels:
+        1: { cost: 200, cooldown: 5.0, damage_bonus: 50 }
+        2: { cost: 200, cooldown: 3.5, damage_bonus: 100 }
+        3: { cost: 200, cooldown: 2.5, damage_bonus: 150 }
+
+# --- NHÁNH 2: TESLA (DEBUFF / SUPPORT) ---
+tesla_tower:
+  parent: base_cannon_tower
+  cost: 450
+  # NERF: Giảm Damage xuống II để đổi lấy hiệu ứng bá đạo
+  stats: { range: 4.0, damage: II, speed: 1.0, aoe_radius: 3.0 }
+  
+  skills:
+    static_shock_passive: # [Nội tại: Sốc điện]
+      name: "Sốc điện"
+      type: PASSIVE_ON_HIT
+      max_stacks: 5
+      duration: 5.0
+      stack_logic: "refresh_duration" # Cơ chế làm mới thời gian
+      
+      # Hiệu ứng khi có ít nhất 1 stack
+      base_effect: 
+        speed_reduction: 1 # Giảm 1 bậc tốc độ (Không cộng dồn)
+        
+      # Hiệu ứng theo số lượng stack (Cộng dồn)
+      # Logic: Giới hạn HP = 100% - (stack * bonus)
+      hp_cap_per_stack: 
+        1: 0.95 # 95%
+        2: 0.95
+        3: 0.90
+        4: 0.90
+        5: 0.85 # 85%
+        
+    overdose_passive: # [Nội tại: Quá liều]
+      name: "Quá liều"
+      type: CONDITIONAL_DEBUFF
+      condition: "stacks == 5"
+      effects:
+        damage_taken_amp: 0.20 # Nhận thêm 20% sát thương
+        duration: 3.0
+        reset_stacks: true # Nổ xong thì mất hết stack Sốc điện
+        
+    overload_chain: # [Kỹ năng: Quá tải]
+      name: "Quá tải"
+      type: CHANCE_ON_HIT
+      effect: "apply_stack" # Gây thêm stack Sốc điện
+      is_chain: true # Giật lan sang 3 mục tiêu
+      levels:
+        1: { cost: 250, chance: 0.15 }
+        2: { cost: 250, chance: 0.20 }
+        3: { cost: 250, chance: 0.25 }

@@ -1,0 +1,204 @@
+# ==========================================
+# FILE CẤU HÌNH QUÁI VẬT (GAME DESIGN DATA)
+# ==========================================
+
+# 1. BẢNG QUY ĐỔI CHỈ SỐ (GLOBAL STATS)
+# ------------------------------------------
+CONSTANTS:
+  DAMAGE_TIERS:
+      I:   15    # Sát thương nhỏ
+      II:  30    # Sát thương trung bình
+      III: 60    # Sát thương khá
+      IV:  120   # Sát thương lớn
+      V:   300   # Sát thương cực lớn (Boss)
+
+  HP_TIERS:
+      LV1: 50    # Máu giấy
+      LV2: 150   # Máu trung bình
+      LV3: 400   # Máu trâu
+      LV4: 800   # Mini Boss
+      LV5: 1500  # Final Boss
+
+  SPEED_TIERS:
+      S1: 0.8    # Chậm (Tanker/Boss)
+      S2: 1.5    # Trung bình
+      S3: 2.5    # Nhanh (Sói/Nhện)
+   # ==========================================
+   # CƠ CHẾ PHÒNG THỦ (DEFENSE MECHANICS)
+   # ==========================================
+
+   # 1. HỆ SỐ GIÁP VẬT LÝ (PHYSICAL ARMOR)
+   # ------------------------------------------
+   # Dùng để giảm sát thương từ Tháp Cung, Tháp Pháo, Lính
+   PHYSICAL_RESISTANCE:
+      NEG:    1.10   # Vulnerable: Nhận 110% sát thương (Yếu trước vật lý)
+      NONE:   1.00   # Normal:     Nhận 100% sát thương (Không giáp)
+      LOW:    0.90   # Light:      Nhận 90% sát thương  (Giáp nhẹ)
+      MED:    0.75   # Medium:     Nhận 75% sát thương  (Giáp trung bình)
+      HIGH:   0.50   # Heavy:      Nhận 50% sát thương  (Giáp nặng)
+      IMMUNE: 0.00   # Spectral:   Nhận 0% sát thương   (Dành riêng cho Vong Linh)
+
+   # Logic Debuff: "Cắt xén" (Shred)
+   # Tác dụng: Giảm 1 bậc giáp của mục tiêu (Ví dụ: HIGH -> MED).
+   # Lưu ý: Không có tác dụng với IMMUNE (trừ khi có kỹ năng đặc biệt phá giải).
+
+   # 2. HỆ SỐ KHÁNG PHÉP (MAGIC RESISTANCE)
+   # ------------------------------------------
+   # Dùng để giảm sát thương từ Tháp Phép, Lửa rồng
+   MAGIC_RESISTANCE:
+      NEG:    1.10   # Vulnerable: Nhận 110% sát thương (Sợ phép)
+      NONE:   1.00   # Normal:     Nhận 100% sát thương
+      LOW:    0.90   # Light:      Nhận 90% sát thương
+      MED:    0.75   # Medium:     Nhận 75% sát thương
+      HIGH:   0.50   # Heavy:      Nhận 50% sát thương
+
+   # Logic Debuff: "Nguyền rủa" (Curse)
+   # Tác dụng: Giảm 1 bậc kháng phép của mục tiêu (Ví dụ: MED -> LOW).
+
+# 2. DANH SÁCH QUÁI VẬT (BESTIARY) - Tổng: 15 loại
+# ------------------------------------------
+
+# --- NHÓM 1: BASIC (Lính cơ bản) ---
+# ==========================================
+# FILE CẤU HÌNH QUÁI VẬT (FINAL VERSION)
+# Bao gồm: Chỉ số, Kỹ năng gốc & Hệ thống Giáp
+# ==========================================
+
+# --- NHÓM 1: BASIC (Lính cơ bản) ---
+1. basic_warrior:
+   - Name: "Chiến binh"
+   - Type: Basic
+   - Movement: Ground
+   - Attack: Melee
+   - [cite_start]Stats: { HP: LV2, Dmg: II, Spd: S2 } [cite: 4]
+   - Defense: { Armor: LOW, MagicRes: NONE }
+   - Description: Lính bộ binh cơ bản.
+
+2. basic_archer:
+   - Name: "Cung thủ"
+   - Type: Basic
+   - Movement: Ground
+   - Attack: Ranged (Range: 150px)
+   - [cite_start]Stats: { HP: LV1, Dmg: II, Spd: S2 } [cite: 5]
+   - Defense: { Armor: NONE, MagicRes: NONE }
+   - Behavior: Đứng lại bắn lính chặn đường từ xa.
+
+3. basic_tanker:
+   - Name: "Đấu sĩ khiên"
+   - Type: Basic
+   - Movement: Ground
+   - Attack: Melee
+   - [cite_start]Stats: { HP: LV3, Dmg: I, Spd: S1 } [cite: 6]
+   - Defense: { Armor: HIGH, MagicRes: LOW }
+   - Role: Tanker (Hút sát thương tháp).
+
+4. basic_bandit:
+   - Name: "Cướp"
+   - Type: Basic
+   - Movement: Ground
+   - Attack: Melee
+   - [cite_start]Stats: { HP: LV2, Dmg: III, Spd: S2 } [cite: 7]
+   - Defense: { Armor: NONE, MagicRes: LOW }
+   - Trait: High Damage (Sát thương tay cao).
+
+5. giant_boss:
+   - Name: "Người Khổng Lồ"
+   - Type: Basic (BOSS)
+   - Movement: Ground
+   - Attack: Melee (Area Splash)
+   - Stats: { HP: LV5, Dmg: IV, Spd: S1 }
+   - Defense: { Armor: MED, MagicRes: MED }
+   - Description: Boss phe Basic. Đòn đánh lan gây sát thương lớn.
+
+# --- NHÓM 2: MONSTER (Quái thú) ---
+6. wolf:
+   - Name: "Sói"
+   - Type: Monster
+   - Movement: Ground
+   - Attack: Melee
+   - [cite_start]Stats: { HP: LV2, Dmg: II, Spd: S3 } [cite: 8]
+   - Defense: { Armor: LOW, MagicRes: NEG }
+   - Trait: Swarm (Thường xuất hiện theo bầy đàn).
+
+7. spider:
+   - Name: "Nhện độc"
+   - Type: Monster
+   - Movement: Ground
+   - Attack: Melee
+   - DamageType: Magic
+   - [cite_start]Stats: { HP: LV1, Dmg: I, Spd: S3 } [cite: 9]
+   - Defense: { Armor: NONE, MagicRes: LOW }
+   - Effect: Poison (Gây sát thương theo thời gian: 5dmg/s trong 3s).
+
+8. bat:
+   - Name: "Dơi"
+   - Type: Monster
+   - Movement: Flying
+   - Attack: Melee
+   - [cite_start]Stats: { HP: LV2, Dmg: I, Spd: S2 } [cite: 10]
+   - Defense: { Armor: NONE, MagicRes: NEG }
+   - Trait: Flying (Bỏ qua địa hình, không bị lính chặn).
+
+9. dragon_boss:
+   - Name: "Hỏa Long"
+   - Type: Monster (FINAL BOSS)
+   - Movement: Flying
+   - Attack: Melee + Area Magic
+   - [cite_start]Stats: { HP: LV5, Dmg: V, Spd: S1 } [cite: 11]
+   - Defense: { Armor: HIGH, MagicRes: HIGH }
+   - DamageType: Mixed (Vật lý + Phép)
+   - Effect: Burn (Thiêu đốt diện rộng).
+
+# --- NHÓM 3: DEMON (Ác quỷ - Kháng phép) ---
+10. demon_warrior:
+    - Name: "Ma đấu sĩ"
+    - Type: Demon
+    - Movement: Ground
+    - Attack: Melee
+    - [cite_start]Stats: { HP: LV3, Dmg: I, Spd: S2 } [cite: 12]
+    - Defense: { Armor: LOW, MagicRes: HIGH }
+    - Trait: Magic Resistance (Giảm sát thương phép nhận vào).
+
+11. demon_mage:
+    - Name: "Ma pháp sư"
+    - Type: Demon
+    - Movement: Ground
+    - Attack: Ranged (Magic)
+    - [cite_start]Stats: { HP: LV1, Dmg: II, Spd: S2 } [cite: 13]
+    - Defense: { Armor: NONE, MagicRes: HIGH }
+    - Effect: Curse (Nguyền rủa - Giảm kháng phép của mục tiêu).
+
+12. summoner_boss:
+    - Name: "Triệu hồi sư"
+    - Type: Demon (MINI BOSS)
+    - Movement: Ground
+    - Attack: Ranged (Magic)
+    - [cite_start]Stats: { HP: LV3, Dmg: III, Spd: S1 } [cite: 14]
+    - Defense: { Armor: MED, MagicRes: HIGH }
+    - Skill: Summon (Triệu hồi 'dark_beast' và 'dark_bat' định kỳ).
+
+# --- NHÓM 4: SUMMONED (Đệ tử của Summoner) ---
+13. dark_beast:
+    - Name: "Thú hắc hóa"
+    - Type: Minion
+    - Movement: Ground
+    - [cite_start]Stats: { HP: LV1, Dmg: I, Spd: S3 } [cite: 15]
+    - Defense: { Armor: NONE, MagicRes: LOW }
+
+14. dark_bat:
+    - Name: "Dơi hắc hóa"
+    - Type: Minion
+    - Movement: Flying
+    - [cite_start]Stats: { HP: LV2, Dmg: I, Spd: S2 } [cite: 16]
+    - Defense: { Armor: NONE, MagicRes: NEG }
+
+# --- NHÓM 5: UNDEAD (Vong linh - Kháng vật lý) ---
+15. ghost:
+    - Name: "Hồn ma"
+    - Type: Undead
+    - Movement: Ground
+    - Attack: Ranged (Magic)
+    - [cite_start]Stats: { HP: LV2, Dmg: II, Spd: S2 } [cite: 17]
+    - Defense: { Armor: IMMUNE, MagicRes: NEG }
+    - Effect: Armor Shred (Giảm giáp vật lý).
+    - [cite_start]Trait: Physical Immunity (Miễn nhiễm sát thương Vật lý)[cite: 18].

@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tower Defense JS - Modular</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Thêm FontAwesome cho icon -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    
+    <!-- START SCREEN -->
+    <div id="start-screen">
+        <div class="start-box">
+            <h1>Thủ Thành</h1>
+            <p>Chiến thuật & Sinh tồn</p>
+            
+            <div class="start-grid">
+                <div class="start-info-box">
+                    <h3 class="how-to-play"><i class="fas fa-gamepad"></i> Cách chơi</h3>
+                    <ul>
+                        <li>Click ô đất để <b>Xây Tháp</b></li>
+                        <li>Nâng cấp tháp để mở khóa kỹ năng</li>
+                        <li>Dùng Skill (Phím 1-2-3) hỗ trợ</li>
+                    </ul>
+                </div>
+                <div class="start-info-box">
+                    <h3 class="tips"><i class="fas fa-lightbulb"></i> Mẹo</h3>
+                    <ul>
+                        <li>Tháp Phép khắc quái Giáp cao</li>
+                        <li>Tháp Cung khắc quái bay</li>
+                        <li>Gọi quái sớm để nhận thêm vàng</li>
+                    </ul>
+                </div>
+            </div>
+
+            <button id="btn-play-game">
+                <i class="fas fa-play"></i> BẮT ĐẦU
+            </button>
+        </div>
+    </div>
+
+    <!-- GAME UI (Ẩn ban đầu) -->
+    <div id="game-ui">
+        <div id="game-container">
+            <canvas id="gameCanvas"></canvas>
+
+            <!-- Stats -->
+            <div id="player-stats">
+                <div class="stat"><span class="stat-icon">❤️</span><span id="lives">20</span></div>
+                <div class="stat"><span class="stat-icon">💰</span><span id="coins">450</span></div>
+                <div class="stat"><span class="stat-icon">🌊</span>Wave: <span id="wave">1</span></div>
+            </div>
+            
+            <!-- Wave Notification -->
+            <div id="wave-notification" class="hidden">
+                <div class="wave-circle">
+                    <div class="wave-icon">💀</div>
+                    <div class="wave-timer-bar" id="wave-timer-bar"></div>
+                </div>
+                <div class="wave-tooltip" id="wave-tooltip">
+                    <div id="next-wave-desc">5 Sói</div>
+                    <div id="wave-bonus-text">Click gọi sớm: +150G</div>
+                </div>
+            </div>
+
+            <!-- Skill Bar (Bottom Left) -->
+            <div id="skill-bar">
+                <div class="skill-slot" id="btn-meteor" title="Mưa Thiên Thạch (Phím 1)">
+                    ☄️
+                    <div class="cooldown-overlay" id="cd-meteor"></div>
+                    <span class="skill-key">1</span>
+                </div>
+                <div class="skill-slot" id="btn-reinforce" title="Triệu Hồi Lính (Phím 2)">
+                    🛡️
+                    <div class="cooldown-overlay" id="cd-reinforce"></div>
+                    <span class="skill-key">2</span>
+                </div>
+                <div class="skill-slot" id="btn-hero-skill" title="Kỹ Năng Hero (Phím 3)">
+                    ⚡
+                    <div class="cooldown-overlay" id="cd-hero-skill"></div>
+                    <span class="skill-key">3</span>
+                </div>
+            </div>
+
+            <!-- Hero Stats Panel (Bottom Right) -->
+            <div id="hero-stats" class="hidden">
+                <!-- [UPDATED] Thêm ID và Title cho nút chọn Hero -->
+                <div id="btn-select-hero" class="hero-portrait" title="Chọn Hero (Phím Space)">🦸‍♂️</div>
+                
+                <div class="hero-info">
+                    <div class="hero-name" id="hero-name-display">Hero Name</div>
+                    <div class="hero-hp-bar">
+                        <div class="hero-hp-fill" id="hero-hp-fill"></div>
+                        <span id="hero-hp-text">100/100</span>
+                    </div>
+                    <div class="hero-details">
+                        <span>⚔️ <span id="hero-dmg-display">0</span></span>
+                        <span>🛡️ <span id="hero-armor-display">LOW</span></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Hero Stats Panel (Bottom Right) -->
+            <div id="hero-stats" class="hidden">
+                <div class="hero-portrait">🦸‍♂️</div>
+                <div class="hero-info">
+                    <div class="hero-name" id="hero-name-display">Hero Name</div>
+                    <div class="hero-hp-bar">
+                        <div class="hero-hp-fill" id="hero-hp-fill"></div>
+                        <span id="hero-hp-text">100/100</span>
+                    </div>
+                    <div class="hero-details">
+                        <span>⚔️ <span id="hero-dmg-display">0</span></span>
+                        <span>🛡️ <span id="hero-armor-display">LOW</span></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Monster Info Panel (Bottom Right - Above Hero) -->
+            <div id="monster-info-panel" class="hidden">
+                <div class="monster-header">
+                    <div>
+                        <h3 id="info-name">Tên Quái</h3>
+                        <span id="info-type">Loại</span>
+                    </div>
+                    <button onclick="deselectMonster()" class="btn-close-panel"><i class="fas fa-times"></i></button>
+                </div>
+                
+                <div class="monster-hp-container">
+                    <div class="monster-hp-text">
+                        <span>HP</span> <span id="info-hp-text">0/0</span>
+                    </div>
+                    <div class="monster-hp-bar-bg">
+                        <div id="info-hp-bar"></div>
+                    </div>
+                </div>
+
+                <div class="stat-grid">
+                    <div class="stat-box"><i class="fas fa-shield-alt text-gray-400"></i> <span id="info-armor">0</span></div>
+                    <div class="stat-box"><i class="fas fa-magic text-purple-400"></i> <span id="info-mr">0%</span></div>
+                    <div class="stat-box"><i class="fas fa-wind text-green-400"></i> <span id="info-speed">0</span></div>
+                    <div class="stat-box"><i class="fas fa-coins text-yellow-400"></i> <span id="info-reward">0g</span></div>
+                </div>
+
+                <div class="monster-effects-container">
+                    <div class="monster-effects-title">Hiệu ứng</div>
+                    <div id="info-effects"></div>
+                </div>
+            </div>
+
+            <!-- Build Menu -->
+            <div id="build-menu" class="game-menu hidden">
+                <div class="menu-title">Xây Dựng Tháp</div>
+                <div class="tower-grid">
+                    <button class="btn-build" data-type="archer" data-cost="70">🏹 Cung <span class="cost">70G</span></button>
+                    <button class="btn-build" data-type="mage" data-cost="90">🔮 Phép <span class="cost">90G</span></button>
+                    <button class="btn-build" data-type="barracks" data-cost="70">🛡️ Lính <span class="cost">70G</span></button>
+                    <button class="btn-build" data-type="cannon" data-cost="110">💣 Pháo <span class="cost">110G</span></button>
+                </div>
+                <button class="btn-action btn-close" id="btn-close-build">Đóng</button>
+            </div>
+
+            <!-- Upgrade Menu -->
+            <div id="upgrade-panel" class="game-menu hidden">
+                <div class="menu-title" id="tower-name">Tên Tháp</div>
+                <div class="upgrade-stats" id="tower-info">...</div>
+                <div id="branch-options"></div>
+                <button class="btn-action btn-upgrade" id="btn-upgrade">⬆️ Nâng cấp</button>
+                <button class="btn-action btn-rally hidden" id="btn-rally">🚩 Đặt vị trí lính</button>
+                <button class="btn-action btn-sell" id="btn-sell">💰 Bán</button>
+                <button class="btn-action btn-close" id="btn-close-upgrade">Đóng</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="./js/main.js"></script>
+</body>
+</html>
